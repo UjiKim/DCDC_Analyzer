@@ -1,0 +1,5 @@
+E:/workspace/Qt/DCDCPowerAnalyzer/build/CMakeFiles/PowerStageAnalyzer.dir
+E:/workspace/Qt/DCDCPowerAnalyzer/build/CMakeFiles/edit_cache.dir
+E:/workspace/Qt/DCDCPowerAnalyzer/build/CMakeFiles/rebuild_cache.dir
+E:/workspace/Qt/DCDCPowerAnalyzer/build/CMakeFiles/PowerStageAnalyzer_autogen_timestamp_deps.dir
+E:/workspace/Qt/DCDCPowerAnalyzer/build/CMakeFiles/PowerStageAnalyzer_autogen.dir

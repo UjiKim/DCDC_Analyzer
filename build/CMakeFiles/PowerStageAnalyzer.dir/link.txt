@@ -1,0 +1,3 @@
+E:\Qt\Tools\CMake_64\bin\cmake.exe -E rm -f CMakeFiles\PowerStageAnalyzer.dir/objects.a
+C:\msys64\mingw64\bin\ar.exe qc CMakeFiles\PowerStageAnalyzer.dir/objects.a @CMakeFiles\PowerStageAnalyzer.dir\objects1.rsp
+C:\msys64\mingw64\bin\g++.exe -g -mwindows -Wl,--whole-archive CMakeFiles\PowerStageAnalyzer.dir/objects.a -Wl,--no-whole-archive -o PowerStageAnalyzer.exe -Wl,--out-implib,libPowerStageAnalyzer.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\PowerStageAnalyzer.dir\linkLibs.rsp
