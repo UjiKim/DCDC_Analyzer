@@ -32,7 +32,7 @@ MainWindow::~MainWindow() {
 
 void MainWindow::setupUi() {
     // [추가] 윈도우 창 아이콘 설정
-    setWindowIcon(QIcon("lablogo.png"));
+    setWindowIcon(QIcon(":/src/DCDC_ICON.ico"));
     
     auto *centralWidget = new QWidget(this);
     // [수정] 전체를 감싸는 루트 레이아웃을 수직(QVBoxLayout)으로 구성하여 하단 영역을 확보합니다.
@@ -146,7 +146,7 @@ void MainWindow::setupUi() {
 
     // 1. 좌측 하단 연구실 로고 (lablogo.png)
     auto *lblLogo = new QLabel();
-    QPixmap logoPixmap("lablogo.png");
+    QPixmap logoPixmap(":/lablogo.png");
     if (!logoPixmap.isNull()) {
         lblLogo->setPixmap(logoPixmap.scaled(200, 50, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     } else {

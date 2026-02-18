@@ -1,0 +1,7 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+  <qresource prefix="/">
+    <file>lablogo.png</file>
+    <file>src/DCDC_ICON.ico</file>
+  </qresource>
+</RCC>
