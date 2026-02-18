@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
     MainWindow window;
 
     // 3. 윈도우 제목 설정 (어보브반도체 스타일로!)
-    window.setWindowTitle("DCDC Power Stage AC Analyzer v0.1");
+    window.setWindowTitle("DCDC Power Stage AC Analyzer v0.1b (Beta)");
 
     // 4. 화면에 표시
     window.show();

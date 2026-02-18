@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # 프로젝트 명 및 버전 설정
-project(DCDCPowerAnalyzer VERSION 1.0.0 LANGUAGES CXX)
+project(DCDCPowerAnalyzer VERSION 0.0.1 LANGUAGES CXX)
 
 # C++ 표준 설정 (Qt 6.10이므로 최신 기능을 위해 C++20 추천)
 set(CMAKE_CXX_STANDARD 20)
@@ -36,6 +36,9 @@ set(SOURCES
     
     # UI (추후 MainWindow 추가 시 주석 해제)
     src/ui/MainWindow.cpp
+
+    # Windows 아이콘 리소스
+    resource.rc
 )
 
 # 헤더 파일 목록 (필요 시 명시, 보통 AUTOMOC이 처리함)

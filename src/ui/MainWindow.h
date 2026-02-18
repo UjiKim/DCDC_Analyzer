@@ -23,7 +23,7 @@ public:
 
 private slots:
     void onCalculateClicked(); // [핵심] 계산 및 로직 동기화 슬롯
-
+    void onExportClicked(); // [추가] CSV 내보내기 슬롯
 private:
     void setupUi();
     void setupCharts();
@@ -47,7 +47,7 @@ private:
     // UI Controls
     QLineEdit *m_editVin, *m_editVout, *m_editL, *m_editC, *m_editIout, *m_editFsw, *m_editRdcr, *m_editResr, *m_editRon;
     QRadioButton *m_rbBuck, *m_rbBoost, *m_rbGd, *m_rbGv;
-    
+    QPushButton *m_btnExport;
     // Charts
     QChartView *m_chartViewMag, *m_chartViewPhase;
     QLineSeries *m_seriesMag, *m_seriesPhase;
@@ -56,5 +56,6 @@ private:
 
     // Results
     QLabel *m_lblMode, *m_lblD1, *m_lblD2, *m_lblM, *m_lblDcGain, *m_lblWp, *m_lblFc, *m_lblPm;
+    AnalysisResult m_lastResult;    // 최신 계산 결과 저장용
 };
 #endif

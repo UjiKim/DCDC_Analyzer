@@ -10,6 +10,11 @@
 #include <QDoubleValidator>
 #include <QToolTip>
 #include <QCursor>
+#include <QFileDialog>
+#include <QTextStream>
+#include <QFile>
+#include <QPixmap>
+#include <QIcon>
 
 #include "utils/MathUtils.h"
 #include <cmath>
@@ -26,11 +31,20 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::setupUi() {
+    // [추가] 윈도우 창 아이콘 설정
+    setWindowIcon(QIcon("lablogo.png"));
+    
     auto *centralWidget = new QWidget(this);
-    auto *mainLayout = new QHBoxLayout(centralWidget);
+    // [수정] 전체를 감싸는 루트 레이아웃을 수직(QVBoxLayout)으로 구성하여 하단 영역을 확보합니다.
+    auto *rootLayout = new QVBoxLayout(centralWidget);
+
+    // 기존의 상단 작업 영역(입력 패널 + 그래프)을 위한 레이아웃입니다.
+    auto *contentLayout = new QHBoxLayout();
 
     // --- [좌측: 입력 패널] ---
     auto *leftPanel = new QVBoxLayout();
+    
+    // 1. 설계 파라미터 그룹
     auto *inputGroup = new QGroupBox("Design Parameters");
     auto *formLayout = new QFormLayout(inputGroup);
 
@@ -40,9 +54,9 @@ void MainWindow::setupUi() {
     m_editC = new QLineEdit("22e-6");
     m_editIout = new QLineEdit("2.0");
     m_editFsw = new QLineEdit("1e6");
-    m_editRdcr = new QLineEdit("150e-3"); // 150mOhm
-    m_editResr = new QLineEdit("150e-3"); // 150mOhm
-    m_editRon = new QLineEdit("500e-3"); // 500mOhm
+    m_editRdcr = new QLineEdit("150e-3");
+    m_editResr = new QLineEdit("150e-3");
+    m_editRon = new QLineEdit("500e-3");
 
     formLayout->addRow("Input Voltage [V]:", m_editVin);
     formLayout->addRow("Output Voltage [V]:", m_editVout);
@@ -53,76 +67,119 @@ void MainWindow::setupUi() {
     formLayout->addRow("Inductor DCR [Ohm]:", m_editRdcr);
     formLayout->addRow("Capacitor ESR [Ohm]:", m_editResr);
     formLayout->addRow("On-Resistance [Ohm]:", m_editRon);
+    leftPanel->addWidget(inputGroup);
 
+    // 2. 실행 버튼 영역
     auto *btnCalc = new QPushButton("Calculate & Plot");
     connect(btnCalc, &QPushButton::clicked, this, &MainWindow::onCalculateClicked);
+    
+    m_btnExport = new QPushButton("Export to CSV");
+    m_btnExport->setEnabled(false); 
+    connect(m_btnExport, &QPushButton::clicked, this, &MainWindow::onExportClicked);
 
-    leftPanel->addWidget(inputGroup);
     leftPanel->addWidget(btnCalc);
-    leftPanel->addStretch(); // 아래쪽 여백 밀어내기
+    leftPanel->addWidget(m_btnExport);
 
-    // --- [좌측: 결과 표시 패널 추가] ---
-    auto *resultGroup = new QGroupBox("Calculated Parameters");
-    auto *resultLayout = new QFormLayout(resultGroup);
-
-    m_lblMode = new QLabel("-");
-    m_lblD1 = new QLabel("-");
-    m_lblD2 = new QLabel("-");
-    m_lblM = new QLabel("-");
-    m_lblDcGain = new QLabel("-");
-    m_lblWp = new QLabel("-");
-
-    // [추가] 안정성 지표 표시용 라벨 (MainWindow.h에도 선언 필요)
-    m_lblFc = new QLabel("-"); // Crossover Frequency
-    m_lblPm = new QLabel("-"); // Phase Margin
-
-    // 단위를 포함한 레이아웃 구성 (LaTeX 스타일 활용)
-    resultLayout->addRow("Operating Mode:", m_lblMode);
-    resultLayout->addRow("Duty Cycle (D1):", m_lblD1);
-    resultLayout->addRow("DCM Duty (D2):", m_lblD2);
-    resultLayout->addRow("Conv. Ratio (M):", m_lblM);
-    resultLayout->addRow("DC Gain (G0):", m_lblDcGain);
-    resultLayout->addRow("Primary Pole (fp):", m_lblWp);
-    resultLayout->addRow("Crossover Freq (fc):", m_lblFc); // [추가]
-    resultLayout->addRow("Phase Margin (PM):", m_lblPm);   // [추가]
-
-    leftPanel->addWidget(resultGroup); // 입력 패널 아래에 추가
-
-    // --- [중요: 라디오 버튼 생성 및 초기화] ---
-    m_rbBuck = new QRadioButton("Buck");
-    m_rbBoost = new QRadioButton("Boost");
-    m_rbBuck->setChecked(true); // 기본값 설정 (중요!)
-
-    m_rbGd = new QRadioButton("Control-to-Output (Gd)");
-    m_rbGv = new QRadioButton("Input-to-Output (Gv)");
-    m_rbGd->setChecked(true); // 기본값 설정
-
-    // 레이아웃에 추가 (잊지 마세요!)
+    // 3. 토폴로지 및 해석 타입 선택
     auto *topoGroup = new QGroupBox("Topology");
     auto *topoLayout = new QVBoxLayout(topoGroup);
+    m_rbBuck = new QRadioButton("Buck");
+    m_rbBoost = new QRadioButton("Boost");
+    m_rbBuck->setChecked(true);
     topoLayout->addWidget(m_rbBuck);
     topoLayout->addWidget(m_rbBoost);
     leftPanel->addWidget(topoGroup);
 
     auto *typeGroup = new QGroupBox("Analysis Type");
     auto *typeLayout = new QVBoxLayout(typeGroup);
+    m_rbGd = new QRadioButton("Control-to-Output (Gd)");
+    m_rbGv = new QRadioButton("Input-to-Output (Gv)");
+    m_rbGd->setChecked(true);
     typeLayout->addWidget(m_rbGd);
     typeLayout->addWidget(m_rbGv);
     leftPanel->addWidget(typeGroup);
+
+    // 4. 결과 표시 그룹
+    auto *resultGroup = new QGroupBox("Calculated Parameters");
+    auto *resultLayout = new QFormLayout(resultGroup);
+    m_lblMode = new QLabel("-");
+    m_lblD1 = new QLabel("-");
+    m_lblD2 = new QLabel("-");
+    m_lblM = new QLabel("-");
+    m_lblDcGain = new QLabel("-");
+    m_lblWp = new QLabel("-");
+    m_lblFc = new QLabel("-");
+    m_lblPm = new QLabel("-");
+
+    resultLayout->addRow("Operating Mode:", m_lblMode);
+    resultLayout->addRow("Duty Cycle (D1):", m_lblD1);
+    resultLayout->addRow("DCM Duty (D2):", m_lblD2);
+    resultLayout->addRow("Conversion Ratio (M):", m_lblM);
+    resultLayout->addRow("DC Gain (G0):", m_lblDcGain);
+    resultLayout->addRow("Dominant Pole Frequency (f0/fp):", m_lblWp);
+    resultLayout->addRow("Crossover Frequency (fc):", m_lblFc);
+    resultLayout->addRow("Phase Margin (PM):", m_lblPm);
+    leftPanel->addWidget(resultGroup);
+
+    leftPanel->addStretch(); 
 
     // --- [우측: 그래프 패널] ---
     auto *rightPanel = new QVBoxLayout();
     m_chartViewMag = new QChartView();
     m_chartViewPhase = new QChartView();
-
     rightPanel->addWidget(m_chartViewMag);
     rightPanel->addWidget(m_chartViewPhase);
 
-    mainLayout->addLayout(leftPanel, 1);
-    mainLayout->addLayout(rightPanel, 3); // 그래프 영역을 더 넓게
+    // 상단 컨텐츠 레이아웃 병합
+    contentLayout->addLayout(leftPanel, 1);
+    contentLayout->addLayout(rightPanel, 3);
+    rootLayout->addLayout(contentLayout, 1);
+
+    // --- [하단: 저작권 및 연구실 메시지 영역] ---
+    auto *line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    rootLayout->addWidget(line);
+
+    // [수정] 로고(좌)와 텍스트(우) 배치를 위한 하단 전용 레이아웃
+    auto *footerLayout = new QHBoxLayout();
+
+    // 1. 좌측 하단 연구실 로고 (lablogo.png)
+    auto *lblLogo = new QLabel();
+    QPixmap logoPixmap("lablogo.png");
+    if (!logoPixmap.isNull()) {
+        lblLogo->setPixmap(logoPixmap.scaled(200, 50, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    } else {
+        lblLogo->setText("[AIMLAB Logo]");
+        lblLogo->setStyleSheet("color: #bdc3c7; font-weight: bold; padding-left: 10px;");
+    }
+    footerLayout->addWidget(lblLogo);
+
+    // 2. 중간 유연한 여백 (로고와 텍스트를 양 끝으로 밀어냄)
+    footerLayout->addStretch();
+
+    // 3. 우측 하단 멘트 및 하이퍼링크
+    auto *lblFooter = new QLabel(
+        "본 프로그램은 <a href='https://sites.google.com/view/amp-lab/' style='color: #7f8c8d; text-decoration: underline;'><b>AIMLAB(전현탁 교수님 연구실)</b></a>의 연구목적으로 제작되었으며, "
+        "상업적 이용 및 무단복제를 금지합니다.<br>"
+        "Copyright © 2026 wjkim. All rights reserved."
+    );
+    lblFooter->setOpenExternalLinks(true);
+    lblFooter->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    lblFooter->setStyleSheet(
+        "QLabel {"
+        "  color: #7f8c8d;"
+        "  font-size: 10pt;"
+        "  padding: 10px;"
+        "  line-height: 150%;"
+        "}"
+    );
+    footerLayout->addWidget(lblFooter);
+
+    rootLayout->addLayout(footerLayout);
 
     setCentralWidget(centralWidget);
-    resize(1200, 800);
+    resize(1200, 950); // 로고와 푸터 높이를 고려하여 창 높이 소폭 조정
 }
 
 void MainWindow::setupCharts() {
@@ -241,6 +298,10 @@ void MainWindow::onCalculateClicked() {
         result.addPoint(f, MathUtils::toDb(resp), MathUtils::toPhase(resp));
     }
 
+    // 4-1. 익스포트용 멤버 변수로 저장
+    m_lastResult = result;
+    m_btnExport->setEnabled(true); // 계산 완료 후 버튼 활성화
+
     // 5. 결과 분석 (DC Gain, fp, fc, PM)
     // 5-1. DC Gain 계산
     std::complex<double> dcResp = m_rbGd->isChecked() ? converter->getGd(1e-3) : converter->getGv(1e-3);
@@ -304,6 +365,43 @@ void MainWindow::onCalculateClicked() {
     }
 
     updatePlots(result);
+}
+
+void MainWindow::onExportClicked() {
+    if (m_lastResult.count() == 0) return;
+
+    // 1. 파일 저장 경로 선택
+    QString fileName = QFileDialog::getSaveFileName(this,
+        "Save Analysis Result", "", "CSV Files (*.csv);;All Files (*)");
+
+    if (fileName.isEmpty()) return;
+
+    // 2. 파일 쓰기 로직
+    QFile file(fileName);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream out(&file);
+        
+        // CSV 헤더 작성
+        QString analysisType = m_rbGd->isChecked() ? "Gd (Control-to-Output)" : "Gv (Input-to-Output)";
+        out << "Analysis Type: " << analysisType << "\n";
+        out << "Frequency [Hz],Magnitude [dB],Phase [deg]\n";
+
+        // 데이터 기록
+        const auto& freqs = m_lastResult.frequencies();
+        const auto& mags = m_lastResult.magnitudes();
+        const auto& phases = m_lastResult.phases();
+
+        for (size_t i = 0; i < m_lastResult.count(); ++i) {
+            out << QString::number(freqs[i], 'f', 4) << ","
+                << QString::number(mags[i], 'f', 4) << ","
+                << QString::number(phases[i], 'f', 4) << "\n";
+        }
+
+        file.close();
+        QMessageBox::information(this, "Export 성공", "데이터가 성공적으로 저장되었습니다.");
+    } else {
+        showCriticalError("파일을 열 수 없습니다.");
+    }
 }
 
 void MainWindow::updatePlots(const AnalysisResult& result) {
