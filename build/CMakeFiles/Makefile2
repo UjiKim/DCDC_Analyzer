@@ -79,8 +79,8 @@ clean: CMakeFiles/PowerStageAnalyzer_autogen.dir/clean
 # Target rules for target CMakeFiles/PowerStageAnalyzer.dir
 
 # All Build rule for target.
-CMakeFiles/PowerStageAnalyzer.dir/all: CMakeFiles/PowerStageAnalyzer_autogen_timestamp_deps.dir/all
 CMakeFiles/PowerStageAnalyzer.dir/all: CMakeFiles/PowerStageAnalyzer_autogen.dir/all
+CMakeFiles/PowerStageAnalyzer.dir/all: CMakeFiles/PowerStageAnalyzer_autogen_timestamp_deps.dir/all
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\PowerStageAnalyzer.dir\build.make CMakeFiles/PowerStageAnalyzer.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\PowerStageAnalyzer.dir\build.make CMakeFiles/PowerStageAnalyzer.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=E:\workspace\Qt\DCDCPowerAnalyzer\build\CMakeFiles --progress-num=1,2,3,4,5,6,7,8,9,10,11 "Built target PowerStageAnalyzer"
