@@ -39,6 +39,7 @@ set(SOURCES
 
     # Windows 아이콘 리소스
     resource.qrc
+    app_info.rc
 )
 
 # 헤더 파일 목록 (필요 시 명시, 보통 AUTOMOC이 처리함)
