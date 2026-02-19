@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # 프로젝트 명 및 버전 설정
-project(DCDCPowerAnalyzer VERSION 0.0.1 LANGUAGES CXX)
+project(DCDCPowerAnalyzer VERSION 0.1.2 LANGUAGES CXX)
 
 # C++ 표준 설정 (Qt 6.10이므로 최신 기능을 위해 C++20 추천)
 set(CMAKE_CXX_STANDARD 20)

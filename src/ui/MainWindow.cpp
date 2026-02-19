@@ -278,7 +278,10 @@ void MainWindow::onCalculateClicked() {
     params.setC(m_editC->text().toDouble());
     params.setIout(m_editIout->text().toDouble());
     params.setFsw(m_editFsw->text().toDouble());
-
+    params.setRdcr(m_editRdcr->text().toDouble());
+    params.setResr(m_editResr->text().toDouble());
+    params.setRon(m_editRon->text().toDouble());
+    
     // 2. 내부 상태 동기화 (Duty, M, K 일괄 계산)
     params.updateInternalState();
 

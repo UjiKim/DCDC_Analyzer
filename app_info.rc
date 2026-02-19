@@ -8,8 +8,8 @@ IDI_ICON1 ICON DISCARDABLE "src/DCDC_ICON.ico"
 
 // 2. 파일 상세 정보 설정
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION     0,1,1,0
-PRODUCTVERSION  0,1,1,0
+FILEVERSION     0,1,0,0
+PRODUCTVERSION  0,1,2,0
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       0x0L
 FILEOS          VOS_NT_WINDOWS32
@@ -22,13 +22,13 @@ BEGIN
         BLOCK "041204b0"
         BEGIN
             VALUE "CompanyName",      "AIMLAB(충북대학교 전현탁 교수님 연구실)"
-            VALUE "FileDescription",  "DCDC 분석기 (V0.1b Beta)"
-            VALUE "FileVersion",      "0.1.1.0"
+            VALUE "FileDescription",  "DCDC 분석기(v0.12b)"
+            VALUE "FileVersion",      "0.1b"
             VALUE "InternalName",     "DCDCPowerAnalyzer"
             VALUE "LegalCopyright",   "Copyright (C) 2026 wjkim. All rights reserved."
             VALUE "OriginalFilename", "PowerStageAnalyzer.exe"
             VALUE "ProductName",      "DCDC Power Stage AC Analyzer"
-            VALUE "ProductVersion",   "0.1.1b"
+            VALUE "ProductVersion",   "0.1.2b"
         END
     END
     BLOCK "VarFileInfo"

@@ -18,7 +18,9 @@ public:
     double L() const { return m_L; }
     double C() const { return m_C; }
     double fsw() const { return m_fsw; }
+    double rDcr() const { return m_rDcr; }
     double rEsr() const { return m_rEsr; }
+    double rOn() const { return m_rOn; }
     double d1() const { return m_d1; }
     double d2() const { return m_d2; }
     double M() const  { return m_M; }  // Conversion Ratio

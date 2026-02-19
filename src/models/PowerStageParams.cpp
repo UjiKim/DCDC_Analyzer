@@ -2,7 +2,7 @@
 
 PowerStageParams::PowerStageParams()
     : m_topology(Topology::Buck), m_vin(12.0), m_vout(5.0), m_iout(1.0)
-    , m_fsw(1e-6), m_L(10e-6), m_C(10e-6)
+    , m_fsw(1e-6), m_L(10e-6), m_C(10e-6), m_rDcr(0.0), m_rEsr(0.0), m_rOn(0.0)
     , m_d1(0.0), m_d2(0.0), m_M(0.0), m_K(0.0), m_Rload(0.0)
 {
     updateInternalState(); // 초기값 동기화
