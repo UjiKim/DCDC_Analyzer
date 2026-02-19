@@ -15,19 +15,19 @@
 ## 분석 모델 및 수식(Mathematical Models)
 ### 1. Buck Converter
 * **CCM($G_{vd}$)**
-$$G_{vd}(s) = V_{in} \cdot \frac{1 + s r_C C}{1 + s \left[ \frac{L}{R} + (r_L + r_C)C \right] + s^2 LC}$$
+    $$G_{vd}(s) = V_{in} \cdot \frac{1 + s r_C C}{1 + s \left[ \frac{L}{R} + (r_L + r_C)C \right] + s^2 LC}$$
 
 * **DCM ($G_{vd}$):**
-$$G_{vd}(s) = \frac{2V_{out}}{D_1} \cdot \frac{1-M}{2-M} \cdot \frac{1 + s r_C C}{1 + s/\omega_p}$$
+    $$G_{vd}(s) = \frac{2V_{out}}{D_1} \cdot \frac{1-M}{2-M} \cdot \frac{1 + s r_C C}{1 + s/\omega_p}$$
 (단, $\omega_p = \frac{2-M}{1-M} \cdot \frac{1}{RC}$)
 
 ### 2. Boost Converter
 * **CCM($G_{vd}$)**
   * 우반평면 영점(RHP Zero)과 DCR에 의한 게인 감쇠를 반영합니다.
-$$G_{vd}(s) = \frac{V_{out}}{D'} \cdot \frac{1}{1 + \frac{r_L}{R D'^2}} \cdot \frac{(1 - s\frac{L}{R D'^2})(1 + s r_C C)}{1 + s \frac{L}{R D'^2} + s^2 \frac{LC}{D'^2}}$$
+    $$G_{vd}(s) = \frac{V_{out}}{D'} \cdot \frac{1}{1 + \frac{r_L}{R D'^2}} \cdot \frac{(1 - s\frac{L}{R D'^2})(1 + s r_C C)}{1 + s \frac{L}{R D'^2} + s^2 \frac{LC}{D'^2}}$$
 
 * **DCM($G_{vd}$)**
-$$G_{vg}(s) = M \cdot \frac{M-1}{2M-1} \cdot \frac{1 + s r_C C}{1 + s/\omega_p}$$
+    $$G_{vg}(s) = M \cdot \frac{M-1}{2M-1} \cdot \frac{1 + s r_C C}{1 + s/\omega_p}$$
 
 ##  사용 방법 (Usage)
 1. Design Parameters 입력
