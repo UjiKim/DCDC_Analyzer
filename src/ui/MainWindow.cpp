@@ -51,8 +51,8 @@ void MainWindow::setupUi() {
     m_editVin = new QLineEdit("12.0");
     m_editVout = new QLineEdit("5.0");
     m_editL = new QLineEdit("10e-6");
-    m_editC = new QLineEdit("22e-6");
-    m_editIout = new QLineEdit("2.0");
+    m_editC = new QLineEdit("10e-6");
+    m_editIout = new QLineEdit("1.0");
     m_editFsw = new QLineEdit("1e6");
     m_editRdcr = new QLineEdit("150e-3");
     m_editResr = new QLineEdit("150e-3");
@@ -183,15 +183,17 @@ void MainWindow::setupUi() {
 }
 
 void MainWindow::setupCharts() {
-    // 1. Magnitude 차트 초기화
+    // 1. Magnitude 차트 초기화 (기존 동일)
     m_seriesMag = new QLineSeries();
     initChart(m_chartViewMag, m_seriesMag, m_axisXMag, m_axisYMag, 
               "Magnitude Response (dB)", "Magnitude [dB]", -60.0, 40.0, 6, Qt::red);
 
     // 2. Phase 차트 초기화
     m_seriesPhase = new QLineSeries();
+    // [해결책 2 반영] Boost CCM의 최대 위상 지연(-270도 이상)을 모두 수용하기 위해 
+    // Y축 범위를 -225 -> -315로 확장하고 간격을 조정합니다.
     initChart(m_chartViewPhase, m_seriesPhase, m_axisXPhase, m_axisYPhase, 
-              "Phase Response (Degree)", "Phase [Degree]", -225.0, 90.0, 8, Qt::blue);
+              "Phase Response (Degree)", "Phase [Degree]", -315.0, 45.0, 9, Qt::blue);
 }
 
 // [신규 함수] 공통 초기화 로직
@@ -294,11 +296,36 @@ void MainWindow::onCalculateClicked() {
     }
 
     // 4. 주파수 스윕 및 데이터 수집
-    auto sweepFreqs = MathUtils::generateLogSpace(1e-1, 1e8, 100); // 변수명 변경 (freqs -> sweepFreqs)
+    auto sweepFreqs = MathUtils::generateLogSpace(1e-1, 1e8, 100);
     AnalysisResult result;
+
+    // [해결책 2] 위상 보정용 변수 초기화
+    double lastPhase = 0.0;
+    double phaseOffset = 0.0;
+    bool isFirst = true;
+
     for (double f : sweepFreqs) {
         std::complex<double> resp = m_rbGd->isChecked() ? converter->getGd(f) : converter->getGv(f);
-        result.addPoint(f, MathUtils::toDb(resp), MathUtils::toPhase(resp));
+        
+        double magDb = MathUtils::toDb(resp);
+        double currentPhase = MathUtils::toPhase(resp); // MathUtils::toPhase는 std::arg 기반 (-180~180)
+
+        // [핵심] Phase Unwrapping 로직
+        // std::arg 결과값이 -180도를 넘는 순간 +180도로 튀는 현상을 보정합니다.
+        if (!isFirst) {
+            // 이전 지점과의 위상 차이가 180도 이상 벌어지면 'Wrapping' 발생으로 간주
+            if (currentPhase - lastPhase > 180.0) {
+                phaseOffset -= 360.0; // 위로 튀었을 때 -360도 보정
+            } else if (currentPhase - lastPhase < -180.0) {
+                phaseOffset += 360.0; // 아래로 튀었을 때 +360도 보정
+            }
+        }
+        
+        // 보정된(Unwrapped) 위상 값을 결과 세트에 저장
+        result.addPoint(f, magDb, currentPhase + phaseOffset);
+        
+        lastPhase = currentPhase;
+        isFirst = false;
     }
 
     // 4-1. 익스포트용 멤버 변수로 저장
