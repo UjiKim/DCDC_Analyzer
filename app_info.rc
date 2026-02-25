@@ -22,8 +22,8 @@ BEGIN
         BLOCK "041204b0"
         BEGIN
             VALUE "CompanyName",      "AIMLAB(충북대학교 전현탁 교수님 연구실)"
-            VALUE "FileDescription",  "DCDC 분석기(v0.12b)"
-            VALUE "FileVersion",      "0.1b"
+            VALUE "FileDescription",  "DCDC 분석기(v0.1b)"
+            VALUE "FileVersion",      "0.1.2b"
             VALUE "InternalName",     "DCDCPowerAnalyzer"
             VALUE "LegalCopyright",   "Copyright (C) 2026 wjkim. All rights reserved."
             VALUE "OriginalFilename", "PowerStageAnalyzer.exe"
