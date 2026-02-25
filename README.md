@@ -25,6 +25,10 @@ $$G_{vd}(s) = V_{in} \cdot \frac{1 + s r_C C}{1 + s \left[ \frac{L}{R} + (r_L + 
 
 
 $$G_{vd}(s) = \frac{2V_{out}}{D_1} \cdot \frac{1-M}{2-M} \cdot \frac{1 + s r_C C}{1 + s/\omega_p}$$
+
+
+
+
 (단, $\omega_p = \frac{2-M}{1-M} \cdot \frac{1}{RC}$)
 
 ### 2. Boost Converter
